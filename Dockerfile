@@ -64,7 +64,7 @@ WORKDIR /coredns_temp
 RUN mv /coredns/coredns ./coredns
 RUN setcap cap_net_bind_service=+ep coredns
 RUN curl -fsSL -o corefile-gen \
-    https://github.com/M-S-Software-Engineering-AG/coredns-envvar-corefile/releases/download/$COREFILE_GEN_VERSION/coredns-envvar-corefile-linux-$TARGETARCH \
+    https://github.com/M-S-Software-Engineering-AG/coredns-envvar-corefile/releases/download/$COREFILE_GEN_VERSION/corefile-gen-linux-$TARGETARCH$TARGETVARIANT \
     && chmod +x corefile-gen
 RUN curl -fsSL -o container-supervisor \
     https://github.com/M-S-Software-Engineering-AG/container-supervisor/releases/download/$SUPERVISOR_VERSION/container-supervisor-linux-$TARGETARCH$TARGETVARIANT \

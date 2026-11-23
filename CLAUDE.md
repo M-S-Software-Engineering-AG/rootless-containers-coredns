@@ -95,21 +95,22 @@ before, since a `go get` failure and a compile failure want to be told apart.
 
 ## Startup: corefile-gen, then CoreDNS
 
-Two release binaries sit next to `coredns`, both fetched from
-`.../releases/download/$VERSION/<tool>-linux-<arch>`. The two repos name their
-32-bit arm asset differently, so the suffix differs — no mapping table either
-way, just different variables:
+Three release binaries sit next to `coredns`, all fetched from
+`.../releases/download/$VERSION/<asset>-linux-$TARGETARCH$TARGETVARIANT`:
 
-| Binary | Repo | Build arg | Asset suffix |
+| Binary | Repo | Build arg | Asset |
 | --- | --- | --- | --- |
-| `corefile-gen` | [coredns-envvar-corefile](https://github.com/M-S-Software-Engineering-AG/coredns-envvar-corefile) | `COREFILE_GEN_VERSION` (`v1.1.0`, set in `docker-bake.hcl`) | `$TARGETARCH` — `amd64`, `arm64`, `arm` |
+| `corefile-gen` | [coredns-envvar-corefile](https://github.com/M-S-Software-Engineering-AG/coredns-envvar-corefile) | `COREFILE_GEN_VERSION` (`v1.1.3`, set in `docker-bake.hcl`) | `corefile-gen-linux-…` — `amd64`, `arm64`, `armv7` |
 | `container-supervisor` | [container-supervisor](https://github.com/M-S-Software-Engineering-AG/container-supervisor) | `SUPERVISOR_VERSION` (`v1.10.0`) | `$TARGETARCH$TARGETVARIANT` — `amd64`, `arm64`, `armv7` |
 | `healthcheck` | [container-healthcheck](https://github.com/M-S-Software-Engineering-AG/container-healthcheck) | `HEALTHCHECK_VERSION` (`v1.0.0`) | `$TARGETARCH$TARGETVARIANT` — `amd64`, `arm64`, `armv7` |
 
 `$TARGETVARIANT` is empty for `linux/amd64` and `linux/arm64` (buildx
 normalises `arm64/v8` to an empty variant) and `v7` for `linux/arm/v7`, so the
 concatenation is exactly the asset name in all three cases. container-supervisor
-published no 32-bit arm build before v1.0.2.
+published no 32-bit arm build before v1.0.2. coredns-envvar-corefile switched to
+this scheme in v1.1.3; up to v1.1.2 its assets were
+`coredns-envvar-corefile-linux-$TARGETARCH` (32-bit arm as plain `arm`), so a
+downgrade past that needs the old URL back.
 
 `corefile-gen` writes the Corefile from `COREDNS_*` env vars to the path it is
 given — a real file, no shell redirection, so it works in a distroless image.
