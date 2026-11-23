@@ -1,0 +1,7 @@
+*
+!modules.json
+!plugins.json
+!supervisor.yml
+!go.mod
+!a-records
+!a-records/**

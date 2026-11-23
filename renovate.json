@@ -1,0 +1,22 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>M-S-Software-Engineering-AG/ci-workflows//renovate/image"],
+  "customManagers": [
+    {
+      "customType": "jsonata",
+      "fileFormat": "json",
+      "managerFilePatterns": ["/^plugins\\.json$/"],
+      "matchStrings": [
+        "$[$contains(ref, /^v/)].{ \"depName\": $substringAfter(repo, \"https://github.com/\"), \"currentValue\": ref }"
+      ],
+      "datasourceTemplate": "github-releases"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "CoreDNS still has 2016 tags v001…v011; strict semver ignores them (the default coerces v011 to 11.0.0)",
+      "matchPackageNames": ["coredns/coredns"],
+      "versioning": "semver"
+    }
+  ]
+}

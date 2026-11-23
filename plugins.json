@@ -1,0 +1,20 @@
+[
+  {
+    "name": "records",
+    "repo": "https://github.com/coredns/records",
+    "ref": "a3157e710d9e57c75e4950a3750228f3ed9bb47a",
+    "before": "forward"
+  },
+  {
+    "name": "traefik",
+    "repo": "https://github.com/M-S-Software-Engineering-AG/coredns-traefik",
+    "ref": "v1.1.0",
+    "before": "template"
+  },
+  {
+    "name": "acmednschallenge",
+    "repo": "https://github.com/M-S-Software-Engineering-AG/coredns-acmednschallenge",
+    "ref": "v2.3.2",
+    "before": "traefik"
+  }
+]
