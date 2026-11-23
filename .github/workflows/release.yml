@@ -2,9 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [main]
-    paths: [docker-bake.hcl]
-  workflow_dispatch:
+    tags: ['*-[0-9]+.[0-9]+']
 
 permissions:
   contents: write

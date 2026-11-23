@@ -166,8 +166,7 @@ The helper runs first, writes the expanded variables into the supervisor's
 
 ## Images
 
-Every push to `main` touching this folder publishes both tags for all three
-platforms:
+Every release publishes both tags for all three platforms:
 
 | Tag | Base | Notes |
 | --- | --- | --- |
@@ -189,12 +188,15 @@ CI uses the shared
 | Workflow | Runs | Does |
 | --- | --- | --- |
 | `CI` | pull requests | `go vet`/`go test` (the `a-records` helper) and builds every bake target for every platform, no push |
-| `Release` | push to `main` touching `docker-bake.hcl`, or by hand | when the `<version>-Y.Z` git tag doesn't exist yet: builds, Trivy-scans (fails on `HIGH`/`CRITICAL`), pushes, tags the commit `<version>-Y.Z`, moves `<version>-Y`, creates the GitHub release |
+| `Auto tag` | push to `main`, or by hand | when anything outside docs and `.github` changed since the last `<version>-Y.Z` tag: tags the commit with the next `<version>-Y.Z`; after a Renovate merge it waits until no other Renovate PR is pending, so a batch ships as one release |
+| `Release` | push of a `<version>-Y.Z` tag | builds, Trivy-scans (fails on `HIGH`/`CRITICAL`), pushes, moves `<version>-Y`, creates the GitHub release |
 | `Daily scan` | daily 08:00 Europe/Zurich | Trivy-scans the published `latest` and `latest-debug` without rebuilding |
 | `Renovate` | every 2 h | bumps the `# renovate:` pinned versions in `docker-bake.hcl` and the plugin refs in `plugins.json` |
 
-A release is cut by a new `COREDNS_VERSION` or a bumped `IMAGE_REVISION`; any
-other change lands in the next one. The workflow aborts on any tag that isn't
+Every change to the image is released and the workflow picks `Y.Z` from the
+git tags: a new `COREDNS_VERSION` starts at `1.0`, any other change bumps `Z`.
+For breaking repackaging, run `Auto tag` by hand with `breaking` ticked to get
+`(Y+1).0`. `IMAGE_REVISION` in `docker-bake.hcl` only tags local builds. The workflow aborts on any tag that isn't
 `<version>-Y`, `<version>-Y.Z` (optionally `-debug`) or `latest[-debug]`.
 
 ## Cross-platform builds
@@ -208,7 +210,7 @@ docker buildx bake
 | `coredns` | `${REGISTRY}/rootless-containers-coredns:${COREDNS_VERSION}-${IMAGE_REVISION}`, `:${COREDNS_VERSION}-<Y>`, `:latest` | `linux/amd64`, `linux/arm64`, `linux/arm/v7` |
 | `coredns-debug` | `${REGISTRY}/rootless-containers-coredns:${COREDNS_VERSION}-${IMAGE_REVISION}-debug`, `:${COREDNS_VERSION}-<Y>-debug`, `:latest-debug` | `linux/amd64`, `linux/arm64`, `linux/arm/v7` |
 
-`REGISTRY`, `COREDNS_VERSION`, `HEALTHCHECK_VERSION` and `IMAGE_REVISION` (default `5.5`) are bake
+`REGISTRY`, `COREDNS_VERSION`, `HEALTHCHECK_VERSION` and `IMAGE_REVISION` (default `0.0`, set by CI on release) are bake
 variables — override any from the environment
 (`COREDNS_VERSION=v1.14.5 docker buildx bake …`).
 
